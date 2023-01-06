@@ -3,7 +3,6 @@ package object Polarizacion {
     /*                       2.1.1 Función de Esteban y Rey                       */
     /* -------------------------------------------------------------------------- */
 
-    /* ------------------------------ DEFINICIONES ------------------------------ */
 
     type DistributionValues = Vector[Double] // Decisiones posibles sobre un tema
     // Tipo para los valores, reales, de una distribución
@@ -14,7 +13,6 @@ package object Polarizacion {
         - Si pi_k.lenght=k, 0 <= pi_k(i) <= 1, 0 <= i <= k-1
         - pi_k.sum == 1
     */
-
     type Distribution = (Frequency, DistributionValues)
 
     /**
@@ -37,12 +35,11 @@ package object Polarizacion {
     /*                  2.2.1 Función de polarización de una red                  */
     /* -------------------------------------------------------------------------- */
 
-    /* ------------------------------ DEFINICIONES ------------------------------ */
 
     type SpecificBeliefConf = Vector[Double]
     /*
-        - Si b : BeliefConf, para cada i en Int, b[i] es un numero entre 0 y 1 que indica cuanto cree el agente i
-        en la veracidad de la proposición p.
+        - Si b : BeliefConf, para cada i en Int, b[i] es un numero entre 0 y 1 que
+        indica cuanto cree el agente i en la veracidad de la proposición p.
         - El numero de agentes es b.length
         - Si existe b(i) < 0 o b(i) > 1 esta mal definida.
         - Para i en Int/A, b(i) no tiene sentido.
@@ -82,7 +79,6 @@ package object Polarizacion {
     /*                         2.3.1 Función de influencia                        */
     /* -------------------------------------------------------------------------- */
 
-    /* ------------------------------ DEFINICIONES ------------------------------ */
 
     type WeightedGraph = (Int, Int) => Double // Función que asocia dos agentes con la influencia del primero sobre el segundo
     type SpecificWeightedGraph = (WeightedGraph, Int) // El Int corresponde al numero de agentes que cree en una creencia
@@ -93,19 +89,40 @@ package object Polarizacion {
     * @return Matriz asociada al grafo de influencia.
     */
     def showWeightedGraph(swg : SpecificWeightedGraph) : IndexedSeq[IndexedSeq[Double]] = {
-        val agentsNumber = swg(1)
-        val weightedGraph = swg(0)
-
+        val agentsNumber = swg._2
+        val weightedGraph = swg._1
         (for{
             i <- 0 until agentsNumber
 
             appliedFunction = (for{
-                j <- 0 until agentsNumber
+              j <- 0 until agentsNumber
             } yield weightedGraph(i, j)).toVector
         } yield appliedFunction).toVector
     }
 
+  /* -------------------------------------------------------------------------- */
+  /*             2.3.2 Función de actualización de una creencia                 */
+  /* -------------------------------------------------------------------------- */
 
+  /**
+   * @param b una creencia específica
+   * @param swg una función de influencia específica
+   * @return creencia específica
+   */
+  def confBiasUpdate (b: SpecificBeliefConf, swg: SpecificWeightedGraph):
+    SpecificBeliefConf= {
+
+    val agentsNumber = swg._2
+    val weightedGraph = swg._1
+
+    (for {
+      i <- 0 until agentsNumber
+      a_i= (for{
+        j <- 0 until agentsNumber
+        if(weightedGraph(j,i)>0)
+      }yield (1-math.abs(b(j)-b(i)))*weightedGraph(j,i)*(b(j)-b(i)))
+    }yield b(i)+(a_i.sum/a_i.length)).toVector
+  }
 
 
 
