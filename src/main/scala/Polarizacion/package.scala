@@ -128,9 +128,19 @@ package object Polarizacion {
     /*         2.3.3 Simulando la evolución de la polarización de una red         */
     /* -------------------------------------------------------------------------- */
 
+    type FunctionUpdate= (SpecificBeliefConf, SpecificWeightedGraph) => SpecificBeliefConf
+
+  /**
+   *
+   * @param fu función de actualización
+   * @param swg función de influencia específica
+   * @param b0 creencia específica
+   * @param t entero, especifica las unidades de tiempo para la simulación
+   * @return Secuencia de creencias específicas correspondientes a cada unidad del tiempo
+   */
+
     def simulate(fu : FunctionUpdate, swg : SpecificWeightedGraph,
                 b0 : SpecificBeliefConf, t : Int) : IndexedSeq[SpecificBeliefConf] = {
-
         def aux(actualBelief : SpecificBeliefConf, actualTime : Int) : SpecificBeliefConf = {
             if(actualTime == 0) actualBelief
             else {
@@ -138,13 +148,9 @@ package object Polarizacion {
                 aux(newBeliefConf, actualTime - 1)
             }
         }
-
         for{
             i <- 0 until t
         } yield aux(b0, i)
     }
-
-
-
 
 }
