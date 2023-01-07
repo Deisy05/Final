@@ -10,7 +10,7 @@ package object Polarizacion {
     type Frequency = Vector[Double] // Probabilidad de la decision
     /*
         - pi_k es una frecuencia de longitud k
-        - Si pi_k.lenght=k, 0 <= pi_k(i) <= 1, 0 <= i <= k-1
+        - Si pi_k.length = k, 0 <= pi_k(i) <= 1, 0 <= i <= k-1
         - pi_k.sum == 1
     */
     type Distribution = (Frequency, DistributionValues)
@@ -100,31 +100,49 @@ package object Polarizacion {
         } yield appliedFunction).toVector
     }
 
-  /* -------------------------------------------------------------------------- */
-  /*             2.3.2 Función de actualización de una creencia                 */
-  /* -------------------------------------------------------------------------- */
+    /* -------------------------------------------------------------------------- */
+    /*             2.3.2 Función de actualización de una creencia                 */
+    /* -------------------------------------------------------------------------- */
 
-  /**
-   * @param b una creencia específica
-   * @param swg una función de influencia específica
-   * @return creencia específica
-   */
-  def confBiasUpdate (b: SpecificBeliefConf, swg: SpecificWeightedGraph):
-    SpecificBeliefConf= {
+    /**
+    * @param b Una creencia específica
+    * @param swg Una función de influencia específica
+    * @return Creencia específica.
+    */
+    def confBiasUpdate (b: SpecificBeliefConf, swg: SpecificWeightedGraph):
+    SpecificBeliefConf = {
 
-    val agentsNumber = swg._2
-    val weightedGraph = swg._1
+        val agentsNumber = swg._2
+        val weightedGraph = swg._1
 
-    (for {
-      i <- 0 until agentsNumber
-      a_i= (for{
-        j <- 0 until agentsNumber
-        if(weightedGraph(j,i)>0)
-      }yield (1-math.abs(b(j)-b(i)))*weightedGraph(j,i)*(b(j)-b(i)))
-    }yield b(i)+(a_i.sum/a_i.length)).toVector
-  }
+        (for{
+            i <- 0 until agentsNumber
+            a_i = (for{
+                j <- 0 until agentsNumber
+                if(weightedGraph(j, i) > 0)
+            } yield (1 - math.abs(b(j) - b(i))) * weightedGraph(j, i) * (b(j) - b(i)))
+        } yield b(i) + (a_i.sum / a_i.length)).toVector
+    }
 
+    /* -------------------------------------------------------------------------- */
+    /*         2.3.3 Simulando la evolución de la polarización de una red         */
+    /* -------------------------------------------------------------------------- */
 
+    def simulate(fu : FunctionUpdate, swg : SpecificWeightedGraph,
+                b0 : SpecificBeliefConf, t : Int) : IndexedSeq[SpecificBeliefConf] = {
+
+        def aux(actualBelief : SpecificBeliefConf, actualTime : Int) : SpecificBeliefConf = {
+            if(actualTime == 0) actualBelief
+            else {
+                val newBeliefConf = fu(actualBelief, swg)
+                aux(newBeliefConf, actualTime - 1)
+            }
+        }
+
+        for{
+            i <- 0 until t
+        } yield aux(b0, i)
+    }
 
 
 

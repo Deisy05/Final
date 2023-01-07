@@ -98,14 +98,17 @@ showWeightedGraph(i2_20)
 /* -------------------------------------------------------------------------- */
 
 confBiasUpdate(b1_10, i1_10)
-
 confBiasUpdate(b1_10, i2_10)
-
 confBiasUpdate(b2_10, i1_10)
-
 confBiasUpdate(b2_10, i2_10)
-
 confBiasUpdate(b3_10, i1_10)
-
 confBiasUpdate(b3_10, i2_10)
 
+/* -------------------------------------------------------------------------- */
+/*         2.3.3 Simulando la evolución de la polarización de una red         */
+/* -------------------------------------------------------------------------- */
+
+for {
+    b <- simulate(confBiasUpdate, i1_10, b1_10, 10)
+    //nags = b1_10._2
+} yield (b, rho(d1, b))
