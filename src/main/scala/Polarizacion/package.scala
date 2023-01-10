@@ -109,9 +109,7 @@ package object Polarizacion {
    * @param swg Una función de influencia específica
    * @return Creencia específica.
    */
-  def confBiasUpdate (b: SpecificBeliefConf, swg: SpecificWeightedGraph):
-  SpecificBeliefConf = {
-
+  def confBiasUpdate (b: SpecificBeliefConf, swg: SpecificWeightedGraph): SpecificBeliefConf = {
     val agentsNumber = swg._2
     val weightedGraph = swg._1
 

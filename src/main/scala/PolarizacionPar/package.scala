@@ -1,4 +1,4 @@
-import Polarizacion.{Distribution, SpecificWeightedGraph}
+import Polarizacion.{Distribution, SpecificBeliefConf, SpecificWeightedGraph}
 
 import scala.collection.parallel.immutable.ParVector
 import scala.collection.parallel.CollectionConverters._
@@ -68,5 +68,19 @@ package object PolarizacionPar {
     val distribution = (for (i <- 0 until (d_k2.length - 1)) yield (d_k2(i + 1) + d_k2(i)) / 2).toVector.par
     // El valor medio de cada intervalo (mid([l_i,l_s] = (l_i + l_s) / 2)
     rhoERPar(frequency, distribution)
+  }
+
+  type WeightedGraph = (Int, Int) => Double // Función que asocia dos agentes con la influencia del primero sobre el segundo
+  def confBiasUpdatePar(b: SpecificBeliefConfPar, swg: SpecificWeightedGraph): SpecificBeliefConfPar = {
+    val agentsNumber = swg._2
+    val weightedGraph = swg._1
+
+    (for {
+      i <- 0 until agentsNumber
+      a_i = (for {
+        j <- 0 until agentsNumber
+        if (weightedGraph(j, i) > 0)
+      } yield (1 - math.abs(b(j) - b(i))) * weightedGraph(j, i) * (b(j) - b(i)))
+    } yield b(i) + (a_i.sum / a_i.length)).toVector.par
   }
 }
