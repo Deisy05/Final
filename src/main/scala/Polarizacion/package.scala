@@ -3,11 +3,11 @@ package object Polarizacion {
     /*                       2.1.1 Función de Esteban y Rey                       */
     /* -------------------------------------------------------------------------- */
 
-
     type DistributionValues = Vector[Double] // Decisiones posibles sobre un tema
     // Tipo para los valores, reales, de una distribución
 
     type Frequency = Vector[Double] // Probabilidad de la decision
+
     /*
         - pi_k es una frecuencia de longitud k
         - Si pi_k.length = k, 0 <= pi_k(i) <= 1, 0 <= i <= k-1
@@ -19,10 +19,10 @@ package object Polarizacion {
     * @param d Una distribución (tupla posibles decisiones y las frecuencias asociadas a ellas)
     * @return Valor de la medida de polarización
     */
-    def rhoER(d: Distribution): Double = {
+    def rhoER(d : Distribution): Double = {
         val K = 10
         val a = 1.6
-        val l = d._1.length // Los vectores deben tener la misma longitud
+        val l = d._2.length // Los vectores deben tener la misma longitud
         val PI = d._1
         val Y = d._2
 
@@ -42,7 +42,7 @@ package object Polarizacion {
         indica cuanto cree el agente i en la veracidad de la proposición p.
         - El numero de agentes es b.length
         - Si existe b(i) < 0 o b(i) > 1 esta mal definida.
-        - Para i en Int/A, b(i) no tiene sentido.
+        - Para i en Int / A, b(i) no tiene sentido.
     */
 
     type GenericBeliefConf = Int => SpecificBeliefConf
@@ -60,7 +60,7 @@ package object Polarizacion {
     * @param sb Una creencia especifica
     * @return Valor de la polarización de ese conjunto de agentes.
     */
-    def rho(d_k: Discretization, sb: SpecificBeliefConf): Double = {
+    def rho(d_k : Discretization, sb : SpecificBeliefConf) : Double = {
         val d_k2 = 0.0 +: d_k :+ 1.0
 
         val frequency = (for {
@@ -91,11 +91,11 @@ package object Polarizacion {
     def showWeightedGraph(swg : SpecificWeightedGraph) : IndexedSeq[IndexedSeq[Double]] = {
         val agentsNumber = swg._2
         val weightedGraph = swg._1
-        (for{
+        (for {
             i <- 0 until agentsNumber
 
-            appliedFunction = (for{
-              j <- 0 until agentsNumber
+            appliedFunction = (for {
+                j <- 0 until agentsNumber
             } yield weightedGraph(i, j)).toVector
         } yield appliedFunction).toVector
     }
@@ -109,15 +109,14 @@ package object Polarizacion {
     * @param swg Una función de influencia específica
     * @return Creencia específica.
     */
-    def confBiasUpdate (b: SpecificBeliefConf, swg: SpecificWeightedGraph):
+    def confBiasUpdate(b : SpecificBeliefConf, swg : SpecificWeightedGraph) :
     SpecificBeliefConf = {
-
         val agentsNumber = swg._2
         val weightedGraph = swg._1
 
-        (for{
+        (for {
             i <- 0 until agentsNumber
-            a_i = (for{
+            a_i = (for {
                 j <- 0 until agentsNumber
                 if(weightedGraph(j, i) > 0)
             } yield (1 - math.abs(b(j) - b(i))) * weightedGraph(j, i) * (b(j) - b(i)))
@@ -128,16 +127,16 @@ package object Polarizacion {
     /*         2.3.3 Simulando la evolución de la polarización de una red         */
     /* -------------------------------------------------------------------------- */
 
-    type FunctionUpdate= (SpecificBeliefConf, SpecificWeightedGraph) => SpecificBeliefConf
+    type FunctionUpdate = (SpecificBeliefConf, SpecificWeightedGraph) => SpecificBeliefConf
 
-  /**
-   *
-   * @param fu función de actualización
-   * @param swg función de influencia específica
-   * @param b0 creencia específica
-   * @param t entero, especifica las unidades de tiempo para la simulación
-   * @return Secuencia de creencias específicas correspondientes a cada unidad del tiempo
-   */
+    /**
+    *
+    * @param fu Función de actualización
+    * @param swg Función de influencia específica
+    * @param b0 Creencia específica
+    * @param t Numero entero (especifica las unidades de tiempo para la simulación)
+    * @return Secuencia de creencias específicas correspondientes a cada unidad del tiempo
+    */
 
     def simulate(fu : FunctionUpdate, swg : SpecificWeightedGraph,
                 b0 : SpecificBeliefConf, t : Int) : IndexedSeq[SpecificBeliefConf] = {
@@ -148,9 +147,6 @@ package object Polarizacion {
                 aux(newBeliefConf, actualTime - 1)
             }
         }
-        for{
-            i <- 0 until t
-        } yield aux(b0, i)
+        Vector.tabulate(t)(t => aux(b0, t))
     }
-
 }
