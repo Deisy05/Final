@@ -14,18 +14,14 @@ val pi5 = Vector(0.9, 0.1)
 
 /* --------------- Valor tipo DistributionValues (decisiones) --------------- */
 
-val y = Vector (1.0, 5.0)
+val y = Vector(1.0, 5.0)
 
 /* -------------------------------- Pruebas --------------------------------- */
 
-rhoER((pi1,y))
-
-rhoER((pi2,y))
-
-rhoER((pi4,y))
-
-rhoER((pi5,y))
-
+rhoER((pi1, y))
+rhoER((pi2, y))
+rhoER((pi4, y))
+rhoER((pi5, y))
 
 /* -------------------------------------------------------------------------- */
 /*                  2.2.1 Función de polarización de una red                  */
@@ -66,19 +62,13 @@ val b2_20 = b2(20)
 val b3_10 = b3(10)
 val b3_20 = b3(20)
 
-
 /* -------------------------------- Pruebas --------------------------------- */
 
 rho(d1,b1_10)
-
 rho(d1,b2_10)
-
 rho(d2,b1_10)
-
 rho(d2,b2_10)
-
 rho(d1,b3_10)
-
 rho(d2,b3_10)
 
 /* -------------------------------------------------------------------------- */
@@ -105,11 +95,8 @@ val i2_20 = i2(20)
 /* -------------------------------- Pruebas --------------------------------- */
 
 showWeightedGraph(i1_10)
-
 showWeightedGraph(i2_10)
-
 showWeightedGraph(i1_20)
-
 showWeightedGraph(i2_20)
 
 /* -------------------------------------------------------------------------- */
@@ -117,15 +104,10 @@ showWeightedGraph(i2_20)
 /* -------------------------------------------------------------------------- */
 
 confBiasUpdate(b1_10, i1_10)
-
 confBiasUpdate(b1_10, i2_10)
-
 confBiasUpdate(b2_10, i1_10)
-
 confBiasUpdate(b2_10, i2_10)
-
 confBiasUpdate(b3_10, i1_10)
-
 confBiasUpdate(b3_10, i2_10)
 
 /* -------------------------------------------------------------------------- */
@@ -136,6 +118,3 @@ for {
     b <- simulate(confBiasUpdate, i1_10, b1_10, 10)
     //nags = b1_10._2
 } yield (b, rho(d1, b))
-
-
-
