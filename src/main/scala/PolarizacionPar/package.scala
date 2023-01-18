@@ -41,7 +41,7 @@ package object PolarizacionPar {
         } // math.pow(PI(i), 1 + a) * PI(j) * math.abs(Y(i) - Y(j))
 
         // Separamos la suma en dos
-        val (sum1, sum2) = (getSum(0, l / 2), getSum(l / 2, l))
+        val (sum1, sum2) = parallel(getSum(0, l / 2), getSum(l / 2, l))
 
         K * (sum1 + sum2)
     }
