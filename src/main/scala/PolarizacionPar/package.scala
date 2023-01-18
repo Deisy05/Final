@@ -24,7 +24,7 @@ package object PolarizacionPar {
     * @param d Una distribución (tupla posibles decisiones y las frecuencias asociadas a ellas)
     * @return Valor de la medida de polarización
     */
-    def rhoER(d: Distribution) : Double = {
+    def rhoERPar(d: DistributionPar) : Double = {
         val K = 10
         val a = 1.6
         val l = d._2.length // Los vectores deben tener la misma longitud
@@ -59,7 +59,7 @@ package object PolarizacionPar {
         - Para i en Int / A, b(i) no tiene sentido.
     */
 
-    type GenericBeliefConfPar = Int => SpecificBeliefConf
+    type GenericBeliefConfPar = Int => SpecificBeliefConfPar
     // Si gb : GenericBeliefConf, entonces gb(n) = b tal que b : BeliefConf
 
     type DiscretizationPar = ParVector[Double]
@@ -83,16 +83,16 @@ package object PolarizacionPar {
             (for {
                 i <- start until end
                 count = (for(j <- sb if j >= d_k2(i) && j < d_k2(i + 1)) yield 1.0).sum
-            } yield count / sb.length).toVector
+            } yield count / sb.length).toVector.par
         }
 
         val(freq1, freq2) = parallel(getFrequency(0, l / 2), getFrequency(l / 2, l - 1))
         val frequency = freq1 ++ freq2
 
-        def getDistribution(start : Int, end : Int) = {
+        def getDistribution(start : Int, end : Int)= {
             (for {
                 i <- start until end
-            } yield (d_k2(i + 1) + d_k2(i)) / 2).toVector
+            } yield (d_k2(i + 1) + d_k2(i)) / 2).toVector.par
         }
 
         val (distr1, distr2) = parallel(getDistribution(0, l / 2), getDistribution(l / 2, l - 1))
@@ -114,7 +114,7 @@ package object PolarizacionPar {
     * @param swg Una función de influencia específica
     * @return Creencia específica.
     */
-    def confBiasUpdate(b: SpecificBeliefConfPar, swg: SpecificWeightedGraph):
+    def confBiasUpdatePar(b: SpecificBeliefConfPar, swg: SpecificWeightedGraph):
     SpecificBeliefConfPar = {
         val agentsNumber = swg._2
         val weightedGraph = swg._1
@@ -126,7 +126,7 @@ package object PolarizacionPar {
                     j <- 0 until agentsNumber
                     if(weightedGraph(j, i) > 0)
                 } yield (1 - math.abs(b(j) - b(i))) * weightedGraph(j, i) * (b(j) - b(i)))
-            } yield b(i) + (a_i.sum / a_i.length)).toVector
+            } yield b(i) + (a_i.sum / a_i.length)).toVector.par
         }
 
         val (specificBelief1, specificBelief2) = parallel(
